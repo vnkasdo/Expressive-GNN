@@ -172,9 +172,7 @@ scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.5)
 acc_tr=[]
 acc_te=[]
 loss_tr=[]
-bestacc=0
-bestloss=np.inf
-best_epoc = 0
+
 for epoch in range(1, args.epochs + 1):
     scheduler.step()
 
