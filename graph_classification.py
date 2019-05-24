@@ -185,13 +185,6 @@ for epoch in range(1, args.epochs + 1):
     acc_te.append(acc_test)
     loss_tr.append(avg_loss)
     
-#     if acc_train>bestacc or avg_loss<bestloss:
-#         bestacc=max(acc_train, bestacc)
-#         bestloss=min(avg_loss, bestloss)
-#         best_epoc=epoch
-        
-#     if epoch-best_epoc>=50:
-#         break
 
 res = pd.DataFrame({"acc_tr":acc_tr,"acc_te":acc_te,"loss_tr":loss_tr})    
 
