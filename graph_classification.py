@@ -109,12 +109,12 @@ def test(args, model, device, train_graphs, test_graphs, epoch):
 
     with torch.no_grad():
         acc_train=0
-        if sum([len(g.node_tags) for g in train_graphs])<120000:
-            emb_tr, output = model(train_graphs)
-            pred = output.max(1, keepdim=True)[1]
-            labels = torch.LongTensor([graph.label for graph in train_graphs]).to(device)
-            correct = pred.eq(labels.view_as(pred)).sum().cpu().item()
-            acc_train = correct / float(len(train_graphs))
+#         if sum([len(g.node_tags) for g in train_graphs])<120000:
+        emb_tr, output = model(train_graphs)
+        pred = output.max(1, keepdim=True)[1]
+        labels = torch.LongTensor([graph.label for graph in train_graphs]).to(device)
+        correct = pred.eq(labels.view_as(pred)).sum().cpu().item()
+        acc_train = correct / float(len(train_graphs))
 
         emb_te, output = model(test_graphs)
         pred = output.max(1, keepdim=True)[1]
@@ -122,9 +122,9 @@ def test(args, model, device, train_graphs, test_graphs, epoch):
         correct = pred.eq(labels.view_as(pred)).sum().cpu().item()
         acc_test = correct / float(len(test_graphs))
         
-        if epoch%10==0:
-            save_obj(emb_tr.cpu().numpy(), './results/{}/embeddings/tr_{}_hid{}_ep{}.pkl'.format(dataset, args.phi,hid_dim,epoch))
-            save_obj(emb_te.cpu().numpy(), './results/{}/embeddings/te_{}_hid{}_ep{}.pkl'.format(dataset, args.phi,hid_dim,epoch))
+#         if epoch%10==0:
+#             save_obj(emb_tr.cpu().numpy(), './results/{}/embeddings/tr_{}_hid{}_ep{}.pkl'.format(dataset, args.phi,hid_dim,epoch))
+#             save_obj(emb_te.cpu().numpy(), './results/{}/embeddings/te_{}_hid{}_ep{}.pkl'.format(dataset, args.phi,hid_dim,epoch))
 
     print("accuracy train: %f,  test: %f" % (acc_train,  acc_test))
 
