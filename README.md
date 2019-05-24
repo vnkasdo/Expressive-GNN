@@ -1,5 +1,21 @@
 # Expressive-GNN
 
+## Dependencies
+numpy
+
+scipy
+
+pytorch
+
+networkx
+
+pandas
+
+pickle
+
+sklearn
+
+## Run
 for simple graph 
 
 ```
