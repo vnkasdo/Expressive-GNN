@@ -109,12 +109,12 @@ def test(args, model, device, train_graphs, test_graphs, epoch):
 
     with torch.no_grad():
         acc_train=0
-        if sum([len(g.node_tags) for g in train_graphs])<120000:
-            emb_tr, output = model(train_graphs)
-            pred = output.max(1, keepdim=True)[1]
-            labels = torch.LongTensor([graph.label for graph in train_graphs]).to(device)
-            correct = pred.eq(labels.view_as(pred)).sum().cpu().item()
-            acc_train = correct / float(len(train_graphs))
+#         if sum([len(g.node_tags) for g in train_graphs])<120000:
+        emb_tr, output = model(train_graphs)
+        pred = output.max(1, keepdim=True)[1]
+        labels = torch.LongTensor([graph.label for graph in train_graphs]).to(device)
+        correct = pred.eq(labels.view_as(pred)).sum().cpu().item()
+        acc_train = correct / float(len(train_graphs))
 
         emb_te, output = model(test_graphs)
         pred = output.max(1, keepdim=True)[1]
@@ -122,9 +122,15 @@ def test(args, model, device, train_graphs, test_graphs, epoch):
         correct = pred.eq(labels.view_as(pred)).sum().cpu().item()
         acc_test = correct / float(len(test_graphs))
         
+<<<<<<< HEAD
         # if epoch%10==0:
         #     save_obj(emb_tr.cpu().numpy(), './results/{}/embeddings/tr_{}_hid{}_ep{}.pkl'.format(dataset, args.phi,hid_dim,epoch))
         #     save_obj(emb_te.cpu().numpy(), './results/{}/embeddings/te_{}_hid{}_ep{}.pkl'.format(dataset, args.phi,hid_dim,epoch))
+=======
+#         if epoch%10==0:
+#             save_obj(emb_tr.cpu().numpy(), './results/{}/embeddings/tr_{}_hid{}_ep{}.pkl'.format(dataset, args.phi,hid_dim,epoch))
+#             save_obj(emb_te.cpu().numpy(), './results/{}/embeddings/te_{}_hid{}_ep{}.pkl'.format(dataset, args.phi,hid_dim,epoch))
+>>>>>>> 2427051f881949bf82c8a57cdae7f1aaf314972f
 
     print("accuracy train: %f,  test: %f" % (acc_train,  acc_test))
 
@@ -179,9 +185,7 @@ scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.5)
 acc_tr=[]
 acc_te=[]
 loss_tr=[]
-bestacc=0
-bestloss=np.inf
-best_epoc = 0
+
 for epoch in range(1, args.epochs + 1):
     scheduler.step()
 
@@ -192,13 +196,6 @@ for epoch in range(1, args.epochs + 1):
     acc_te.append(acc_test)
     loss_tr.append(avg_loss)
     
-#     if acc_train>bestacc or avg_loss<bestloss:
-#         bestacc=max(acc_train, bestacc)
-#         bestloss=min(avg_loss, bestloss)
-#         best_epoc=epoch
-        
-#     if epoch-best_epoc>=50:
-#         break
 
 res = pd.DataFrame({"acc_tr":acc_tr,"acc_te":acc_te,"loss_tr":loss_tr})    
 
