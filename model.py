@@ -7,7 +7,6 @@ import torch
 from torch import nn
 from torch.nn.parameter import Parameter
 import torch.nn.functional as F
-from torchvision import models
 from util import sps_block_diag
 
 
@@ -27,6 +26,26 @@ class PHI(nn.Module):
     def forward(self, x):
         x = x.abs().pow(1/self.m)*x.sign()
         return phi(x,self.m)
+    
+def vdphi(x, m):
+    y = [torch.ones(x.shape[0],1).to(x.device)]
+    y.append(x[:,1:])
+    for i in range(1, m+1):        
+        y.append(x[:,[0]].pow(i))
+        if i<m:
+            y.append(x[:,[0]].pow(i)*x[:,1:])
+            
+    return torch.cat(y,dim=1)
+
+class vdPHI(nn.Module):
+    def __init__(self, m):
+        super(vdPHI, self).__init__()
+        self.m = m
+        # self.p = nn.Parameter(torch.rand(1))
+        
+    def forward(self, x):
+        x = torch.cat([x[:,[0]].abs().pow(1/self.m)*x[:,[0]].sign(),x[:,1:]],dim=1)
+        return vdphi(x,self.m)
 
 class MLP(nn.Module):
     def __init__(self, in_dim, out_dims, batch_norm=True, dropout=0):

@@ -33,7 +33,7 @@ parser.add_argument('--agg', type=str, default="cat", choices=["cat", "sum"],
                     help='aggregate input and its neighbors, can be extended to other method like mean, max etc.')
 parser.add_argument('--attribute', action="store_true",
                     help='Whether it is for attributed graph.')
-parser.add_argument('--phi', type=str, default="power", choices=["power", "identical", "MLP"],
+parser.add_argument('--phi', type=str, default="power", choices=["power", "identical", "MLP", "vdmd"],
                     help='transformation before aggregation')
 parser.add_argument('--first_phi', action="store_true",
                     help='Whether using phi for first layer. False indicates no transform')
@@ -122,9 +122,9 @@ def test(args, model, device, train_graphs, test_graphs, epoch):
         correct = pred.eq(labels.view_as(pred)).sum().cpu().item()
         acc_test = correct / float(len(test_graphs))
         
-        if epoch%10==0:
-            save_obj(emb_tr.cpu().numpy(), './results/{}/embeddings/tr_{}_hid{}_ep{}.pkl'.format(dataset, args.phi,hid_dim,epoch))
-            save_obj(emb_te.cpu().numpy(), './results/{}/embeddings/te_{}_hid{}_ep{}.pkl'.format(dataset, args.phi,hid_dim,epoch))
+        # if epoch%10==0:
+        #     save_obj(emb_tr.cpu().numpy(), './results/{}/embeddings/tr_{}_hid{}_ep{}.pkl'.format(dataset, args.phi,hid_dim,epoch))
+        #     save_obj(emb_te.cpu().numpy(), './results/{}/embeddings/te_{}_hid{}_ep{}.pkl'.format(dataset, args.phi,hid_dim,epoch))
 
     print("accuracy train: %f,  test: %f" % (acc_train,  acc_test))
 
@@ -162,6 +162,13 @@ elif args.phi=="MLP":
         ph = [MLP(in_dim,(hid_dim,in_dim), batch_norm=True)]+[MLP(hid_dim,(hid_dim,hid_dim), batch_norm=True) for i in range(4)]
     else:
         ph = [lambda x:x]+[MLP(hid_dim,(hid_dim,hid_dim), batch_norm=True) for i in range(4)]
+elif args.phi == "vdmd":
+    if firstphi:
+        phi_features = (in_dim*m+1, hid_dim*m+1,hid_dim*m+1,hid_dim*m+1,hid_dim*m+1)
+        ph = [vdPHI(m) for i in range(5)]
+    else:
+        phi_features = (in_dim, hid_dim*m+1,hid_dim*m+1,hid_dim*m+1,hid_dim*m+1)
+        ph = [lambda x:x]+[vdPHI(m) for i in range(4)]
 
 model = AttDGraphNN(in_dim,phi_features,out_features, n_class=num_classes, dropout=dropout, phis=ph,
                       batch_norm=True, agg=agg).to(device)
